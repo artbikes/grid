@@ -1,0 +1,76 @@
+!!! 5
+%html
+  %head
+    %meta{:charset => "utf-8"}
+    %title Classic Type
+    %meta{:name => "description", :content => ""}
+    %meta{:name => "author", :content => ""}
+    :plain
+      <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+      <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+      <![endif]-->
+    %script{ :type => "text/javascript", :src => "kibo.js"}
+  %body
+    %canvas{ :id => "canvas", :width => "300", :height =>"300"}
+    :javascript
+      var canvas = document.getElementById("canvas");
+      var context = canvas.getContext("2d")
+      var words = ["aa","aah","moo","cow","pig","cat","trod","quest"];
+      var ypos = 45;
+      var ndx = 0;
+      context.font = "bold 24px sans-serif";
+      context.shadowColor = "transparent";
+      context.strokeStyle = "#fff"
+
+      for (var i = 0; i < words.length; i++) {
+        context.fillText(words[i], 48,ypos );
+        ypos = ypos + 30;
+      }
+      ypos = 45;
+      context.fillStyle = "#000"
+      var k = new Kibo();
+      var toErase = "";
+      var oldpos = "";
+      var attempt = new Array();
+      var current = words[ndx];
+      k.down('backspace', function() { return false; });
+      var newpos = 155;
+      k.down(['any letter', 'any number','backspace'], function() {
+        if(k.lastKey() == 'backspace' && attempt != "")
+        {
+          toErase = attempt.pop();
+          oldpos = newpos - context.measureText(toErase).width;
+          context.fillStyle = "#fff";
+          context.lineWidth = "5";
+          context.fillText(toErase, oldpos, ypos);
+          context.strokeText(toErase, oldpos, ypos);
+          context.fillStyle = "#000";
+          context.lineWidth = "1";
+          newpos = oldpos;
+        }
+        else if(k.lastKey() == 'backspace')
+        {
+          console.log("Attempt = " + attempt);
+        }
+        else
+        {
+          attempt.push(k.lastKey());
+          context.fillText(k.lastKey(), newpos, ypos);
+          console.log(k.lastKey() + ' was pressed');
+          newx = context.measureText(k.lastKey()).width;
+          newpos = newpos + newx ;
+          if(attempt.join('') == words[ndx])
+          {
+            console.log("woo woo");
+            ypos = ypos + 30;
+            newpos = 155;
+            attempt.length = 0;
+            ndx++;
+          }
+        };    
+      });
+
+      k.up('any', function() {
+        console.log(attempt.join(''));
+      });
