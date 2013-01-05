@@ -20,7 +20,7 @@ class Application < Sinatra::Base
 		property :word,		String
 	end
 	DataMapper.finalize
-	Wordtype.auto_upgrade!
+	DataMapper.auto_upgrade!
 	class DbSeeds
 		def self.seed
 			DO IT
